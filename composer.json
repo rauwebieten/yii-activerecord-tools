@@ -1,0 +1,27 @@
+{
+  "name": "rauwebieten/yii-activerecord-tools",
+  "type": "library",
+  "minimum-stability": "stable",
+  "description": "YII2 active record tools",
+  "require": {
+    "php": ">=7.3.0",
+    "yiisoft/yii2": "*",
+    "yiisoft/yii2-bootstrap": "*"
+  },
+  "require-dev": {
+    "yidas/yii2-composer-bower-skip": "*",
+    "yiisoft/yii2-debug": "*",
+    "yiisoft/yii2-gii": "*"
+  },
+  "authors": [
+    {
+      "name": "rauwe.bieten",
+      "email": "rauwe.bieten@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "RauweBieten\\YiiActiveRecordTools\\": "src/"
+    }
+  }
+}
