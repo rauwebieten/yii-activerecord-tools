@@ -1,7 +1,7 @@
 <?php
 
 
-namespace RauweBieten\YiiActiveRecordTools;
+namespace rauwebieten\yiiactiverecordtools;
 
 
 use yii\base\BootstrapInterface;
@@ -19,8 +19,9 @@ class ActiveRecordToolsModule extends Module implements BootstrapInterface
 
     public function bootstrap($app)
     {
-        if ($app instanceof Application) {
-            $this->controllerNamespace = 'RauweBieten\YiiActiveRecordTools\commands';
-        }
+        var_dump($app);exit;
+//        if ($app instanceof Application) {
+//            $this->controllerNamespace = 'rauwebieten\yiiactiverecordtools\commands';
+//        }
     }
 }

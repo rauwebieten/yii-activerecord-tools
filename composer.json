@@ -21,7 +21,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "RauweBieten\\YiiActiveRecordTools\\": "src/"
+      "rauwebieten\\yiiactiverecordtools\\": "src/"
     }
   }
 }
