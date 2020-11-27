@@ -8,6 +8,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
+use rauwebieten\yiiactiverecordtools\ActiveRecordToolsModule;
 use yii\base\Component;
 use yii\console\Controller;
 use yii\db\ActiveQuery;
@@ -19,10 +20,10 @@ use yii\helpers\Inflector;
 
 abstract class AbstractModelGenerator extends Component
 {
-    public $db = 'db';
-    public $baseNamespace = 'app\models';
-    public $baseClass = ActiveRecord::class;
-    public $baseQueryClass = ActiveQuery::class;
+    public $db;
+    public $baseNamespace;
+    public $baseModelClass;
+    public $baseQueryClass;
 
     /** @var Controller */
     public $console;
@@ -40,6 +41,14 @@ abstract class AbstractModelGenerator extends Component
     public function init()
     {
         parent::init();
+
+        $module = ActiveRecordToolsModule::getInstance();
+
+        $this->db = $module->db;
+        $this->baseNamespace = $module->namespace;
+        $this->baseModelClass = $module->baseModelClass;
+        $this->baseQueryClass = $module->baseQueryClass;
+
         $this->db_conn = \Yii::$app->get($this->db);
     }
 
@@ -105,7 +114,7 @@ abstract class AbstractModelGenerator extends Component
             $class->setAbstract();
             $class->addComment("Class " . $class->getName());
             $class->addComment("@package " . $namespace->getName());
-            $class->setExtends($this->baseClass);
+            $class->setExtends($this->baseModelClass);
 
             $this->map[$tableName]['abstractModel'] = [];
             $this->map[$tableName]['abstractModel']['file'] = $file;

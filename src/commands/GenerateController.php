@@ -24,13 +24,11 @@ class GenerateController extends Controller
     /**
      * Generates models for all tables in the database
      * @return int
+     * @throws \yii\base\NotSupportedException
      */
-    public function actionModels($db = 'db')
+    public function actionModels()
     {
-        (new GeneratorFactory())->createModelGenerator([
-            'db' => $db,
-            'console' => $this,
-        ])->run();
+        (new GeneratorFactory())->createModelGenerator(['console' => $this])->run();
         return ExitCode::OK;
     }
 

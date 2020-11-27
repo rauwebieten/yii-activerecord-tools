@@ -5,11 +5,17 @@ namespace rauwebieten\yiiactiverecordtools;
 use yii\base\BootstrapInterface;
 use yii\base\Module;
 use yii\console\Application;
-use yii\web\GroupUrlRule;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 class ActiveRecordToolsModule extends Module implements BootstrapInterface
 {
     public $controllerNamespace = 'rauwebieten\yiiactiverecordtools\controllers';
+
+    public $db = 'db';
+    public $namespace = '\app\models';
+    public $baseModelClass = ActiveRecord::class;
+    public $baseQueryClass = ActiveQuery::class;
 
     public function bootstrap($app)
     {

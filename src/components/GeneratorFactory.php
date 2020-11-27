@@ -4,13 +4,15 @@
 namespace rauwebieten\yiiactiverecordtools\components;
 
 
+use rauwebieten\yiiactiverecordtools\ActiveRecordToolsModule;
 use yii\base\NotSupportedException;
 
 class GeneratorFactory
 {
     public function createModelGenerator($options)
     {
-        $conn = \Yii::$app->get($options['db']);
+        $module = ActiveRecordToolsModule::getInstance();
+        $conn = \Yii::$app->get($module->db);
         if ($conn->driverName === 'mysql') {
             return new MySqlModelGenerator($options);
         }
