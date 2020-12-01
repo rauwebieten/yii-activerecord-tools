@@ -13,7 +13,7 @@ class ActiveRecordToolsModule extends Module implements BootstrapInterface
     public $controllerNamespace = 'rauwebieten\yiiactiverecordtools\controllers';
 
     public $db = 'db';
-    public $namespace = '\app\models';
+    public $namespace = 'app\models';
     public $baseModelClass = ActiveRecord::class;
     public $baseQueryClass = ActiveQuery::class;
 

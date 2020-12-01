@@ -70,19 +70,16 @@ abstract class AbstractModelGenerator extends Component
         $this->writeAllFiles();
     }
 
-    protected function classify($v)
-    {
-        return Inflector::camelize(Inflector::camel2words($v));
-    }
-
     protected function createMap()
     {
+        $schema = $this->db_conn->getSchema();
         $this->map = [];
 
         $tableNames = $this->getTableNames();
 
         foreach ($tableNames as $tableName) {
-            $this->map[$tableName] = [];
+            $tableSchema = $schema->getTableSchema($tableName);
+            $this->map[$tableSchema->fullName] = [];
         }
     }
 
@@ -108,18 +105,19 @@ abstract class AbstractModelGenerator extends Component
             $file->addComment('Do not make changes to this file.');
             $file->addComment('Instead, modify the concrete model class.');
 
-            $namespace = $file->addNamespace($this->baseNamespace . '\\' . $this->db . ($tableSchema->schemaName ? '\\' . $tableSchema->schemaName : '') . '\base');
+            $namespaceText = $this->baseNamespace . '\\' . $this->db . ($tableSchema->schemaName ? '\\' . $tableSchema->schemaName : '') . '\base';
+            $namespace = $file->addNamespace($namespaceText);
 
-            $class = $namespace->addClass($this->classify($tableSchema->name));
+            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name]));
             $class->setAbstract();
             $class->addComment("Class " . $class->getName());
             $class->addComment("@package " . $namespace->getName());
             $class->setExtends($this->baseModelClass);
 
-            $this->map[$tableName]['abstractModel'] = [];
-            $this->map[$tableName]['abstractModel']['file'] = $file;
-            $this->map[$tableName]['abstractModel']['namespace'] = $namespace;
-            $this->map[$tableName]['abstractModel']['class'] = $class;
+            $this->map[$tableSchema->fullName]['abstractModel'] = [];
+            $this->map[$tableSchema->fullName]['abstractModel']['file'] = $file;
+            $this->map[$tableSchema->fullName]['abstractModel']['namespace'] = $namespace;
+            $this->map[$tableSchema->fullName]['abstractModel']['class'] = $class;
 
             $i++;
             Console::updateProgress($i, count($this->map));
@@ -145,18 +143,18 @@ abstract class AbstractModelGenerator extends Component
 
             $namespace = $file->addNamespace($this->baseNamespace . '\\' . $this->db . ($tableSchema->schemaName ? '\\' . $tableSchema->schemaName : ''));
 
-            $class = $namespace->addClass($this->classify($tableName));
+            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name]));
             $class->addComment("Class " . $class->getName());
             $class->addComment("@package " . $namespace->getName());
             $class->setExtends(
                 Helper::canonical(
-                    $this->map[$tableName]['abstractModel']['class']
+                    $this->map[$tableSchema->fullName]['abstractModel']['class']
                 )
             );
 
-            $this->map[$tableName]['concreteModel']['file'] = $file;
-            $this->map[$tableName]['concreteModel']['namespace'] = $namespace;
-            $this->map[$tableName]['concreteModel']['class'] = $class;
+            $this->map[$tableSchema->fullName]['concreteModel']['file'] = $file;
+            $this->map[$tableSchema->fullName]['concreteModel']['namespace'] = $namespace;
+            $this->map[$tableSchema->fullName]['concreteModel']['class'] = $class;
 
             $i++;
             Console::updateProgress($i, count($this->map));
@@ -183,15 +181,15 @@ abstract class AbstractModelGenerator extends Component
 
             $namespace = $file->addNamespace($this->baseNamespace . '\\' . $this->db . ($tableSchema->schemaName ? '\\' . $tableSchema->schemaName : '') . '\base');
 
-            $class = $namespace->addClass($this->classify("$tableName query"));
+            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name,'query']));
             $class->setAbstract();
             $class->addComment("Class " . $class->getName());
             $class->addComment("@package " . $namespace->getName());
             $class->setExtends($this->baseQueryClass);
 
-            $this->map[$tableName]['abstractQuery']['file'] = $file;
-            $this->map[$tableName]['abstractQuery']['namespace'] = $namespace;
-            $this->map[$tableName]['abstractQuery']['class'] = $class;
+            $this->map[$tableSchema->fullName]['abstractQuery']['file'] = $file;
+            $this->map[$tableSchema->fullName]['abstractQuery']['namespace'] = $namespace;
+            $this->map[$tableSchema->fullName]['abstractQuery']['class'] = $class;
 
             $i++;
             Console::updateProgress($i, count($this->map));
@@ -217,18 +215,18 @@ abstract class AbstractModelGenerator extends Component
 
             $namespace = $file->addNamespace($this->baseNamespace . '\\' . $this->db . ($tableSchema->schemaName ? '\\' . $tableSchema->schemaName : ''));
 
-            $class = $namespace->addClass($this->classify("$tableName query"));
+            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name,'query']));
             $class->addComment("Class " . $class->getName());
             $class->addComment("@package " . $namespace->getName());
             $class->setExtends(
                 Helper::canonical(
-                    $this->map[$tableName]['abstractQuery']['class']
+                    $this->map[$tableSchema->fullName]['abstractQuery']['class']
                 )
             );
 
-            $this->map[$tableName]['concreteQuery']['file'] = $file;
-            $this->map[$tableName]['concreteQuery']['namespace'] = $namespace;
-            $this->map[$tableName]['concreteQuery']['class'] = $class;
+            $this->map[$tableSchema->fullName]['concreteQuery']['file'] = $file;
+            $this->map[$tableSchema->fullName]['concreteQuery']['namespace'] = $namespace;
+            $this->map[$tableSchema->fullName]['concreteQuery']['class'] = $class;
 
             $i++;
             Console::updateProgress($i, count($this->map));
@@ -239,12 +237,16 @@ abstract class AbstractModelGenerator extends Component
 
     protected function addDbMethod()
     {
+        $schema = $this->db_conn->getSchema();
+
         Console::startProgress(0, count($this->map), 'Adding db method: ', 10);
         $i = 0;
 
         foreach ($this->map as $tableName => $item) {
+            $tableSchema = $schema->getTableSchema($tableName);
+
             /** @var Method $method */
-            $method = $this->map[$tableName]['abstractModel']['class']->addMethod('getDb');
+            $method = $this->map[$tableSchema->fullName]['abstractModel']['class']->addMethod('getDb');
             $method->setStatic();
             $method->addBody("return \Yii::\$app->get('{$this->db}');");
             $method->addComment("Returns the database connection used by this active record class.");
@@ -258,14 +260,18 @@ abstract class AbstractModelGenerator extends Component
 
     protected function addTableNameMethod()
     {
+        $schema = $this->db_conn->getSchema();
+
         Console::startProgress(0, count($this->map), 'Adding table name method: ', 10);
         $i = 0;
 
         foreach ($this->map as $tableName => $item) {
+            $tableSchema = $schema->getTableSchema($tableName);
+
             /** @var Method $method */
-            $method = $this->map[$tableName]['abstractModel']['class']->addMethod('tableName');
+            $method = $this->map[$tableSchema->fullName]['abstractModel']['class']->addMethod('tableName');
             $method->setStatic();
-            $method->addBody("return '$tableName';");
+            $method->addBody("return '{$tableSchema->fullName}';");
             $method->setReturnType('string');
             $method->addComment("@return string the name of the table associated with this ActiveRecord class.");
 
@@ -278,15 +284,19 @@ abstract class AbstractModelGenerator extends Component
 
     protected function addFindMethod()
     {
+        $schema = $this->db_conn->getSchema();
+
         Console::startProgress(0, count($this->map), 'Adding find method: ', 10);
         $i = 0;
 
         foreach ($this->map as $tableName => $item) {
-            $concreteQueryClass = $this->map[$tableName]['concreteQuery']['class'];
+            $tableSchema = $schema->getTableSchema($tableName);
+
+            $concreteQueryClass = $this->map[$tableSchema->fullName]['concreteQuery']['class'];
             $concreteQueryCanonical = Helper::canonical($concreteQueryClass);
 
             /** @var Method $method */
-            $method = $this->map[$tableName]['abstractModel']['class']->addMethod('find');
+            $method = $this->map[$tableSchema->fullName]['abstractModel']['class']->addMethod('find');
             $method->setStatic();
             $method->addBody("return new {$concreteQueryCanonical}(get_called_class());");
             $method->setReturnType($concreteQueryCanonical);
@@ -321,7 +331,7 @@ abstract class AbstractModelGenerator extends Component
                 $description[] = $columnSchema->allowNull ? "null" : "not-null";
                 $description = implode(", ", $description);
 
-                $this->map[$tableName]['abstractModel']['class']->addComment("@property $type \${$columnName} This property represents the $columnName column: $description");
+                $this->map[$tableSchema->fullName]['abstractModel']['class']->addComment("@property $type \${$columnName} This property represents the $columnName column: $description");
             }
 
             $i++;
@@ -383,6 +393,10 @@ abstract class AbstractModelGenerator extends Component
                 $pkTableName = $foreignKey[0];
                 unset($foreignKey[0]);
 
+                if (!isset($this->map[$pkTableName])) {
+                    continue;
+                }
+
                 $fkColumn = array_key_first($foreignKey);
                 $pkColumn = $foreignKey[$fkColumn];
 
@@ -399,7 +413,7 @@ abstract class AbstractModelGenerator extends Component
             $rulesAsCode = "[\n" . implode("\n", $rules) . "\n]";
 
             /** @var Method $method */
-            $method = $this->map[$tableName]['abstractModel']['class']->addMethod('rules');
+            $method = $this->map[$tableSchema->fullName]['abstractModel']['class']->addMethod('rules');
             $method->setReturnType('array');
             $method->addComment("@return array");
             $method->addBody("return $rulesAsCode;");
@@ -422,15 +436,19 @@ abstract class AbstractModelGenerator extends Component
 
     protected function addAllMethodToQueryClass()
     {
+        $schema = $this->db_conn->getSchema();
+
         Console::startProgress(0, count($this->map), 'Abstract query class: adding all method: ', 10);
         $i = 0;
 
         foreach ($this->map as $tableName => $item) {
-            $concreteModelClass = $this->map[$tableName]['concreteModel']['class'];
+            $tableSchema = $schema->getTableSchema($tableName);
+
+            $concreteModelClass = $this->map[$tableSchema->fullName]['concreteModel']['class'];
             $concreteModelCanonical = Helper::canonical($concreteModelClass);
 
             /** @var Method $method */
-            $method = $this->map[$tableName]['abstractQuery']['class']->addMethod('all');
+            $method = $this->map[$tableSchema->fullName]['abstractQuery']['class']->addMethod('all');
             $method->addParameter('db', null);
             $method->addBody("return parent::all(\$db);");
             $method->addComment("Fetches all results");
@@ -446,14 +464,18 @@ abstract class AbstractModelGenerator extends Component
 
     protected function addOneMethodToQueryClass()
     {
+        $schema = $this->db_conn->getSchema();
+
         Console::startProgress(0, count($this->map), 'Abstract query class: adding one method: ', 10);
         $i = 0;
 
         foreach ($this->map as $tableName => $item) {
-            /** @var ClassType $abstractQueryClass */
-            $abstractQueryClass = $this->map[$tableName]['abstractQuery']['class'];
+            $tableSchema = $schema->getTableSchema($tableName);
 
-            $concreteModelClass = $this->map[$tableName]['concreteModel']['class'];
+            /** @var ClassType $abstractQueryClass */
+            $abstractQueryClass = $this->map[$tableSchema->fullName]['abstractQuery']['class'];
+
+            $concreteModelClass = $this->map[$tableSchema->fullName]['concreteModel']['class'];
             $concreteModelClassCanonical = Helper::canonical($concreteModelClass);
 
             /** @var Method $method */
@@ -482,6 +504,10 @@ abstract class AbstractModelGenerator extends Component
             foreach ($fkTableSchema->foreignKeys as $foreignKey) {
                 $pkTableName = $foreignKey[0];
 
+                if (!isset($this->map[$pkTableName])) {
+                    continue;
+                }
+
                 $pkTableSchema = $schema->getTableSchema($pkTableName);
 
                 $sourceName = $fkTableSchema->fullName;
@@ -505,6 +531,10 @@ abstract class AbstractModelGenerator extends Component
 
                 $pkTableName = $foreignKey[0];
                 unset($foreignKey[0]);
+
+                if (!isset($this->map[$pkTableName])) {
+                    continue;
+                }
 
                 $pkTableSchema = $schema->getTableSchema($pkTableName);
 
