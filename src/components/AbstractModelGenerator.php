@@ -12,7 +12,6 @@ use rauwebieten\yiiactiverecordtools\ActiveRecordToolsModule;
 use yii\base\Component;
 use yii\console\Controller;
 use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
 use yii\db\Connection;
 use yii\helpers\Console;
 use yii\helpers\FileHelper;
@@ -181,7 +180,7 @@ abstract class AbstractModelGenerator extends Component
 
             $namespace = $file->addNamespace($this->baseNamespace . '\\' . $this->db . ($tableSchema->schemaName ? '\\' . $tableSchema->schemaName : '') . '\base');
 
-            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name,'query']));
+            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name, 'query']));
             $class->setAbstract();
             $class->addComment("Class " . $class->getName());
             $class->addComment("@package " . $namespace->getName());
@@ -215,7 +214,7 @@ abstract class AbstractModelGenerator extends Component
 
             $namespace = $file->addNamespace($this->baseNamespace . '\\' . $this->db . ($tableSchema->schemaName ? '\\' . $tableSchema->schemaName : ''));
 
-            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name,'query']));
+            $class = $namespace->addClass(Helper::arrayToClassName([$tableSchema->name, 'query']));
             $class->addComment("Class " . $class->getName());
             $class->addComment("@package " . $namespace->getName());
             $class->setExtends(
