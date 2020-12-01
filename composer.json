@@ -1,27 +1,37 @@
 {
-  "name": "rauwebieten/yii-activerecord-tools",
-  "type": "library",
-  "minimum-stability": "stable",
-  "description": "YII2 active record tools",
-  "require": {
-    "php": ">=7.3.0",
-    "yiisoft/yii2": "*",
-    "yiisoft/yii2-bootstrap": "*"
-  },
-  "require-dev": {
-    "yidas/yii2-composer-bower-skip": "*",
-    "yiisoft/yii2-debug": "*",
-    "yiisoft/yii2-gii": "*"
-  },
-  "authors": [
-    {
-      "name": "rauwe.bieten",
-      "email": "rauwe.bieten@gmail.com"
+    "name": "rauwebieten/yii-activerecord-tools",
+    "type": "library",
+    "minimum-stability": "stable",
+    "description": "YII2 active record tools",
+    "require": {
+        "php": ">=7.3.0",
+        "yiisoft/yii2": "~2.0.14",
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "nette/php-generator": "^3.5"
+    },
+    "require-dev": {
+        "yidas/yii2-composer-bower-skip": "*",
+        "yiisoft/yii2-debug": "~2.1.0",
+        "yiisoft/yii2-gii": "~2.1.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "codeception/codeception": "^4.0",
+        "codeception/verify": "~0.5.0 || ~1.1.0",
+        "codeception/specify": "~0.4.6",
+        "symfony/browser-kit": ">=2.7 <=4.2.4",
+        "codeception/module-filesystem": "^1.0.0",
+        "codeception/module-yii2": "^1.0.0",
+        "codeception/module-asserts": "^1.0.0",
+        "symfony/var-dumper": "^5.1"
+    },
+    "authors": [
+        {
+            "name": "rauwe.bieten",
+            "email": "rauwe.bieten@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "rauwebieten\\yiiactiverecordtools\\": "src/"
+        }
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "rauwebieten\\yiiactiverecordtools\\": "src/"
-    }
-  }
 }

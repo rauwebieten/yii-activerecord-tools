@@ -19,8 +19,12 @@ class Helper
     public static function arrayToClassName($array)
     {
         $array = array_values(array_filter($array, function ($item) {
-            return !empty($item);
+            return !empty(trim($item));
         }));
+
+        $array = array_map(function ($string) {
+            return strtolower( Inflector::camel2words($string) );
+        }, $array);
 
         $string = implode(' ', $array);
         $string = Inflector::camelize($string);
