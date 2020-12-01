@@ -41,3 +41,5 @@ possible configuration options:
 ```
 php yii activerecord_tools/generate/models
 ```
+
+Models are generated in your models folder. Commit and use.
