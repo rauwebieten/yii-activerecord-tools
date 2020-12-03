@@ -16,6 +16,9 @@ class GeneratorFactory
         if ($conn->driverName === 'mysql') {
             return new MySqlModelGenerator($options);
         }
+        if ($conn->driverName === 'dblib') {
+            return new MsSqlModelGenerator($options);
+        }
         if ($conn->driverName === 'sqlsrv') {
             return new MsSqlModelGenerator($options);
         }
