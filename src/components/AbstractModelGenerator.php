@@ -12,6 +12,7 @@ use rauwebieten\yiiactiverecordtools\ActiveRecordToolsModule;
 use yii\base\Component;
 use yii\console\Controller;
 use yii\db\ActiveQuery;
+use yii\db\ColumnSchema;
 use yii\db\Connection;
 use yii\helpers\Console;
 use yii\helpers\FileHelper;
@@ -357,6 +358,10 @@ abstract class AbstractModelGenerator extends Component
             foreach ($tableSchema->getColumnNames() as $columnName) {
 
                 $columnSchema = $tableSchema->getColumn($columnName);
+
+                if ($columnSchema instanceof \yii\db\mssql\ColumnSchema && $columnSchema->isComputed) {
+                    continue;
+                }
 
                 switch ($columnSchema->type) {
                     case 'boolean':
