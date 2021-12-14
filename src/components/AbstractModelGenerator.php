@@ -363,6 +363,10 @@ abstract class AbstractModelGenerator extends Component
                     continue;
                 }
 
+                if ($columnName === 'msrepl_tran_version') {
+                    continue;
+                }
+
                 switch ($columnSchema->type) {
                     case 'boolean':
                         $rules[] = "['$columnName', 'boolean', 'trueValue' => 1, 'falseValue' => 0, 'strict' => false]";
@@ -373,6 +377,10 @@ abstract class AbstractModelGenerator extends Component
                         break;
                     default:
                         $rules[] = "['$columnName', '$columnSchema->phpType']";
+                }
+
+                if ($columnSchema->defaultValue) {
+                    $rules[] = "['$columnName', 'default', 'value' => '$columnSchema->defaultValue']";
                 }
 
                 if (!$columnSchema->allowNull && !$columnSchema->autoIncrement) {
