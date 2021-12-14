@@ -379,7 +379,7 @@ abstract class AbstractModelGenerator extends Component
                         $rules[] = "['$columnName', '$columnSchema->phpType']";
                 }
 
-                if ($columnSchema->defaultValue) {
+                if ($columnSchema->defaultValue !== null) {
                     $rules[] = "['$columnName', 'default', 'value' => '$columnSchema->defaultValue']";
                 }
 
