@@ -380,7 +380,14 @@ abstract class AbstractModelGenerator extends Component
                 }
 
                 if ($columnSchema->defaultValue !== null) {
-                    $rules[] = "['$columnName', 'default', 'value' => '$columnSchema->defaultValue']";
+                    if (is_string($columnSchema->defaultValue)) {
+                        $value = $columnSchema->defaultValue;
+                        $rules[] = "['$columnName', 'default', 'value' => '{$value}']";
+                    }
+                    if (is_int($columnSchema->defaultValue)) {
+                        $value = $columnSchema->defaultValue;
+                        $rules[] = "['$columnName', 'default', 'value' => {$value}]";
+                    }
                 }
 
                 if (!$columnSchema->allowNull && !$columnSchema->autoIncrement) {
