@@ -21,13 +21,11 @@ class MsSqlModelGenerator extends AbstractModelGenerator
         return $result;
     }
 
-    public function getDefaultValue($tableName, $columnName)
+    public function getDefaultValue($tableSchema, $tableName, $columnName)
     {
-        [$tableSchema,$tableNameWithoutSchema] = explode('.', $tableName);
-
         $sql = "
             SELECT COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = '$tableSchema' AND TABLE_NAME = '$tableNameWithoutSchema' AND COLUMN_NAME = '$columnName';
+            WHERE TABLE_SCHEMA = '$tableSchema' AND TABLE_NAME = '$tableName' AND COLUMN_NAME = '$columnName';
         ";
         $command = $this->db_conn->createCommand($sql);
 

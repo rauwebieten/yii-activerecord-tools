@@ -89,7 +89,7 @@ abstract class AbstractModelGenerator extends Component
         return $schema->tableNames;
     }
 
-    public function getDefaultValue($tableName, $columnName)
+    public function getDefaultValue($tableSchema, $tableName, $columnName)
     {
         $schema = $this->db_conn->getSchema();
         $tableSchema = $schema->getTableSchema($tableName);
@@ -388,7 +388,7 @@ abstract class AbstractModelGenerator extends Component
                         $rules[] = "['$columnName', '$columnSchema->phpType']";
                 }
 
-                $defaultValue = $this->getDefaultValue($tableName, $columnName);
+                $defaultValue = $this->getDefaultValue($tableSchema->schemaName, $tableName, $columnName);
                 if ($defaultValue !== null) {
                     $rules[] = "['$columnName', 'default', 'value' => $defaultValue]";
                 }
