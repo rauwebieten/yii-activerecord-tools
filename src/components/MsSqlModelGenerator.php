@@ -32,6 +32,6 @@ class MsSqlModelGenerator extends AbstractModelGenerator
         $defaultValue = $command->queryScalar();
         $defaultValue = preg_replace('/^\(N?(.+)\)$/', '$1', $defaultValue);
 
-        return $defaultValue;
+        return $defaultValue !== '' ? $defaultValue : null;
     }
 }
