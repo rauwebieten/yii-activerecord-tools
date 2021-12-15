@@ -4,6 +4,8 @@
 namespace rauwebieten\yiiactiverecordtools\components;
 
 
+use yii\db\Expression;
+
 class MsSqlModelGenerator extends AbstractModelGenerator
 {
     public function getTableNames()
@@ -30,8 +32,30 @@ class MsSqlModelGenerator extends AbstractModelGenerator
         $command = $this->db_conn->createCommand($sql);
 
         $defaultValue = $command->queryScalar();
-        $defaultValue = preg_replace('/^\(N?(.+)\)$/', '$1', $defaultValue);
 
-        return $defaultValue !== '' ? $defaultValue : null;
+        if ($defaultValue === null) {
+            return null;
+        }
+        if ($defaultValue === false) {
+            return null;
+        }
+
+        // remove first and last char
+        $defaultValue = substr($defaultValue, 1, -1);
+
+        if (preg_match('/^\d+$/', $defaultValue)) {
+            return preg_replace('/^(\d+)$/','$1', $defaultValue);
+        }
+        if (preg_match('/^\(\d\)+$/', $defaultValue)) {
+            return preg_replace('/^\((\d+)\)$/','$1', $defaultValue);
+        }
+        if (preg_match("/^N?'.+'$/", $defaultValue)) {
+            return preg_replace("/^'(.+)'$/",'$1', $defaultValue);
+        }
+        if ($defaultValue === 'NULL') {
+            return null;
+        }
+        $expression = preg_replace('/^(.+)$/','$1', $defaultValue);
+        return new Expression($expression);
     }
 }
