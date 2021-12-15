@@ -89,6 +89,15 @@ abstract class AbstractModelGenerator extends Component
         return $schema->tableNames;
     }
 
+    public function getDefaultValue($tableName, $columnName)
+    {
+        $schema = $this->db_conn->getSchema();
+        $tableSchema = $schema->getTableSchema($tableName);
+        $columnSchema = $tableSchema->getColumn($columnName);
+
+        return $columnSchema->defaultValue;
+    }
+
     protected function makeAbstractModelClasses()
     {
         $schema = $this->db_conn->getSchema();
@@ -379,15 +388,9 @@ abstract class AbstractModelGenerator extends Component
                         $rules[] = "['$columnName', '$columnSchema->phpType']";
                 }
 
-                if ($columnSchema->defaultValue !== null) {
-                    if (is_string($columnSchema->defaultValue)) {
-                        $value = $columnSchema->defaultValue;
-                        $rules[] = "['$columnName', 'default', 'value' => '{$value}']";
-                    }
-                    if (is_int($columnSchema->defaultValue)) {
-                        $value = $columnSchema->defaultValue;
-                        $rules[] = "['$columnName', 'default', 'value' => {$value}]";
-                    }
+                $defaultValue = $this->getDefaultValue($tableName, $columnName);
+                if ($defaultValue !== null) {
+                    $rules[] = "['$columnName', 'default', 'value' => $defaultValue]";
                 }
 
                 if (!$columnSchema->allowNull && !$columnSchema->autoIncrement) {
