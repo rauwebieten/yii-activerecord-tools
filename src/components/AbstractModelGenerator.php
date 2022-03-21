@@ -61,6 +61,7 @@ abstract class AbstractModelGenerator extends Component
         $this->makeConcreteQueryClasses();
         $this->addDbMethod();
         $this->addTableNameMethod();
+        $this->addPrimaryKeyMethod();
         $this->addFindMethod();
         $this->addColumnsAsProperties();
         $this->addRulesMethod();
@@ -283,6 +284,30 @@ abstract class AbstractModelGenerator extends Component
             $method->addBody("return '{$tableSchema->fullName}';");
             $method->setReturnType('string');
             $method->addComment("@return string the name of the table associated with this ActiveRecord class.");
+
+            $i++;
+            Console::updateProgress($i, count($this->map));
+        }
+
+        Console::endProgress();
+    }
+
+    protected function addPrimaryKeyMethod()
+    {
+        $schema = $this->db_conn->getSchema();
+
+        Console::startProgress(0, count($this->map), 'Adding PK method: ', 10);
+        $i = 0;
+
+        foreach ($this->map as $tableName => $item) {
+            $tableSchema = $schema->getTableSchema($tableName);
+            $pks = var_export($tableSchema->primaryKey, true);
+
+            /** @var Method $method */
+            $method = $this->map[$tableSchema->fullName]['abstractModel']['class']->addMethod('primaryKey');
+            $method->setStatic();
+            $method->addBody("return $pks;");
+            $method->addComment("Returns the PK's of the table.");
 
             $i++;
             Console::updateProgress($i, count($this->map));
