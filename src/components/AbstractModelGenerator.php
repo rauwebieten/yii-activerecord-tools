@@ -416,7 +416,7 @@ abstract class AbstractModelGenerator extends Component
                 $defaultValue = $this->getDefaultValue($tableSchema->schemaName, $tableName, $columnName);
 
                 if (!$columnSchema->allowNull && !$columnSchema->autoIncrement && !$defaultValue) {
-                    $rules[] = "['$columnName', 'required']";
+                    $rules[] = "['$columnName', 'required', true]";
                 }
 
                 if ($columnName === 'email') {
