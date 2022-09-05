@@ -479,14 +479,14 @@ abstract class AbstractModelGenerator extends Component
                     $rules[] = "['$columnName', 'email']";
                 }
 
-                if ($columnSchema->defaultValue !== null) {
-                    if (is_string($columnSchema->defaultValue)) {
-                        $v = str_replace("'","\\'", $columnSchema->defaultValue);
-                        $rules[] = "['$columnName', 'default', 'value' => '{$v}']";
-                    } else {
-                        $rules[] = "['$columnName', 'default', 'value' => {$columnSchema->defaultValue}]";
-                    }
-                }
+//                if ($columnSchema->defaultValue !== null) {
+//                    if (is_string($columnSchema->defaultValue)) {
+//                        $v = str_replace("'","\\'", $columnSchema->defaultValue);
+//                        $rules[] = "['$columnName', 'default', 'value' => '{$v}']";
+//                    } else {
+//                        $rules[] = "['$columnName', 'default', 'value' => {$columnSchema->defaultValue}]";
+//                    }
+//                }
             }
 
             foreach ($uniqueIndexes as $indexName => $columns) {
