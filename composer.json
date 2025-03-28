@@ -6,7 +6,6 @@
     "require": {
         "php": ">=7.3.0",
         "yiisoft/yii2": "~2.0.14",
-        "yiisoft/yii2-bootstrap": "~2.0.0",
         "nette/php-generator": "^3.5"
     },
     "require-dev": {
