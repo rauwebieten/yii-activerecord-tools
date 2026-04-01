@@ -475,6 +475,12 @@ abstract class AbstractModelGenerator extends Component
                     $rules[] = "['$columnName', 'required']";
                 }
 
+                if ($defaultValue !== null) {
+                    // ['age', 'default', 'value' => null],
+                    $defaultValueJson = json_encode($defaultValue);
+                    $rules[] = "['$columnName', 'default', 'value' => $defaultValueJson]";
+                }
+
                 if ($columnName === 'email') {
                     $rules[] = "['$columnName', 'email']";
                 }
