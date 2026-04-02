@@ -469,30 +469,24 @@ abstract class AbstractModelGenerator extends Component
                         $rules[] = "['$columnName', '$columnSchema->phpType']";
                 }
 
-                $defaultValue = $this->getDefaultValue($tableSchema->schemaName, $tableName, $columnName);
-
-                if (!$columnSchema->allowNull && !$columnSchema->autoIncrement && $defaultValue === null) {
+                if (!$columnSchema->allowNull && !$columnSchema->autoIncrement && $columnSchema->defaultValue === null) {
                     $rules[] = "['$columnName', 'required']";
-                }
-
-                if ($defaultValue !== null) {
-                    // ['age', 'default', 'value' => null],
-                    $defaultValueJson = json_encode($defaultValue);
-                    $rules[] = "['$columnName', 'default', 'value' => $defaultValueJson]";
                 }
 
                 if ($columnName === 'email') {
                     $rules[] = "['$columnName', 'email']";
                 }
 
-//                if ($columnSchema->defaultValue !== null) {
-//                    if (is_string($columnSchema->defaultValue)) {
-//                        $v = str_replace("'","\\'", $columnSchema->defaultValue);
-//                        $rules[] = "['$columnName', 'default', 'value' => '{$v}']";
-//                    } else {
-//                        $rules[] = "['$columnName', 'default', 'value' => {$columnSchema->defaultValue}]";
-//                    }
-//                }
+                if ($columnSchema->defaultValue !== null) {
+                    if (is_string($columnSchema->defaultValue)) {
+                        if (!preg_match('/\($/', $columnSchema->defaultValue)) {
+                            $v = str_replace("'","\\'", $columnSchema->defaultValue);
+                            $rules[] = "['$columnName', 'default', 'value' => '{$v}']";
+                        }
+                    } else {
+                        $rules[] = "['$columnName', 'default', 'value' => {$columnSchema->defaultValue}]";
+                    }
+                }
             }
 
             foreach ($uniqueIndexes as $indexName => $columns) {
